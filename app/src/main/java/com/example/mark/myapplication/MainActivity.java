@@ -17,6 +17,11 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_play;
     private Button btn_pause;
 
+    //synthesis variables
+    private boolean pauseReq_event;
+    private boolean btn_play_event;
+    private boolean btn_pause_event;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
         btn_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                if (mp != null) {
-                    mp.start();
-                }
+                btn_play_event = true;
+                frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
+                btn_play_event = true;
             }
         });
 
@@ -49,11 +54,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 // check for already playing
-                if (mp.isPlaying()) {
-                    if (mp != null) {
-                        mp.pause();
-                    }
-                }
+                btn_pause_event = true;
+                frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
+                btn_pause_event = true;
             }
         });
 
@@ -62,8 +65,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
+        pauseReq_event = true;
+        frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
+        pauseReq_event = false;
 
-        mp.pause();
+    }
+
+    private void frpSynth(boolean pauseReq_event, boolean btn_play_event, boolean btn_pause_event) {
+        //sythesized code goes here
+        //[[music <- play()]] = mp.start()
+        //[[music <- pause()]] = mp.pause
     }
 
     @Override
