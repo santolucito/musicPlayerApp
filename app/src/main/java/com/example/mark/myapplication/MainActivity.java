@@ -1,41 +1,91 @@
 package com.example.mark.myapplication;
 
+import android.content.res.AssetFileDescriptor;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Chronometer;
-import android.widget.TextView;
+
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 
 public class MainActivity extends AppCompatActivity {
-    /**
-     * Called when the activity is first created.
-     */
-    long timeOnClock = 0;
-    boolean running = false;
+
+    private MediaPlayer mp;
+    private Button btn_play;
+    private Button btn_pause;
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView uploadStatus = (TextView)findViewById(R.id.uploadStatus);
-        Button buttonStart = (Button) findViewById(R.id.buttonstart);
-        Button buttonStop = (Button) findViewById(R.id.buttonstop);
+        btn_play = (Button) findViewById(R.id.buttonstart);
+        btn_pause = (Button) findViewById(R.id.buttonpause);
 
-        buttonStart.setOnClickListener(new Button.OnClickListener() {
+        mp = new MediaPlayer();
+        mp.setOnCompletionListener(new OnCompletionListener() {
             @Override
-            public void onClick(View v) {
-                uploadStatus.setText("uploading...");
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                loadSong();
+                mp.start();
             }
         });
-        buttonStop.setOnClickListener(new Button.OnClickListener() {
+        loadSong();
+
+        btn_play.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                uploadStatus.setText("not uploading");
+            public void onClick(View arg0) {
+                if (mp != null) {
+                    mp.start();
+                }
+            }
+        });
+
+        btn_pause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                // check for already playing
+                if (mp.isPlaying()) {
+                    if (mp != null) {
+                        mp.pause();
+                    }
+                }
             }
         });
 
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        mp.pause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mp.start();
+    }
+
+    public void loadSong() {
+        try {
+            AssetFileDescriptor afd = getAssets().openFd("song.mp3");
+
+            mp.reset();
+            mp.setDataSource(afd);
+            mp.prepare();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
+
+

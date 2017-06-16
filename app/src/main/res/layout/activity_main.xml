@@ -16,21 +16,14 @@
             android:id="@+id/buttonstart"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Start Upload"
+            android:text="Play"
             />
         <Button
-            android:id="@+id/buttonstop"
+            android:id="@+id/buttonpause"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Finish Upload"
+            android:text="Pause"
             />
-        <TextView
-            android:id="@+id/uploadStatus"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="Status"
-            />
-
 
     </LinearLayout>
 
