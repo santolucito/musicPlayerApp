@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean btn_play_event;
     private boolean btn_pause_event;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
