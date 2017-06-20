@@ -1,10 +1,9 @@
 package com.example.mark.myapplication;
 
 import android.content.res.AssetFileDescriptor;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -18,9 +17,9 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_pause;
 
     //synthesis variables
-    private boolean pauseReq_event;
-    private boolean btn_play_event;
-    private boolean btn_pause_event;
+    private boolean pausereq = false;
+    private boolean playbutton = false;
+    private boolean pausebutton = false;
 
     //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -40,13 +39,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         loadSong();
+        Log.d("t",pausebutton+" "+pausereq+" "+playbutton);
 
         btn_play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                btn_play_event = true;
-                frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
-                btn_play_event = true;
+                playbutton = true;
+                musicSynth(pausebutton, pausereq, playbutton);
+                playbutton = false;
             }
         });
 
@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 // check for already playing
-                btn_pause_event = true;
-                frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
-                btn_pause_event = true;
+                pausebutton = true;
+                musicSynth(pausebutton, pausereq, playbutton);
+                pausebutton = false;
             }
         });
 
@@ -65,23 +65,79 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        pauseReq_event = true;
-        frpSynth(pauseReq_event, btn_play_event, btn_pause_event);
-        pauseReq_event = false;
+        pausereq = true;
+        musicSynth(pausebutton, pausereq, playbutton);
+        pausereq = true;
 
     }
 
-    private void frpSynth(boolean pauseReq_event, boolean btn_play_event, boolean btn_pause_event) {
-        //sythesized code goes here
-        //[[music <- play()]] = mp.start()
-        //[[music <- pause()]] = mp.pause
+    //output variable - NB outputs must NOT be set elsewhere
+    private boolean music;
+    //internal state tracker, dont set this anywhere else either
+    private int state = 0;
+
+    //Synthesized 'FRP' program
+    private void musicSynth(boolean pausebutton , boolean pausereq , boolean playbutton){
+        if ( state==0 && ((((isevent(playbutton)) || (! isevent(pausereq))) || (! isevent(pausebutton))) && (((isevent(playbutton)) || (isevent(pausereq))) || (! isevent(pausebutton)))) && (((isevent(playbutton)) || (! isevent(pausereq))) || (isevent(pausebutton)))){
+            music=(play());
+            state=0;
+        }
+        if ( state==0 && ((! isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton))){
+            music=(pause());
+            state=0;
+        }
+        if ( state==0 && ((! isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+            music=music;
+            state=0;
+        }
+
+        if ( state==0 && ((! isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))){
+            music=(pause());
+            state=1;
+        }
+
+        if ( state==1 && ((isevent(playbutton)) && (! isevent(pausereq))) && (! isevent(pausebutton))){
+            music=(play());
+            state=0;
+        }
+        if ( state==1 && ((isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+            music=(pause());
+            state=0;
+        }
+
+        if ( state==1 && ((! isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+            music=(play());
+            state=1;
+        }
+        if ( state==1 && ((((! isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))) || (((! isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton)))) || (((isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton)))){
+            music=(pause());
+            state=1;
+        }
+        if ( state==1 && (((isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))) || (((! isevent(playbutton)) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
+            music=music;
+            state=1;
+        }
+        Log.d("myout",pausebutton+" "+pausereq+" "+playbutton+" "+state);
+
     }
 
+    private boolean play(){
+        mp.start();
+        return true;
+    }
+    private boolean pause(){
+        mp.pause();
+        return false;
+    }
+    private boolean isevent(boolean x){
+        return x;
+    }
     @Override
     public void onResume() {
         super.onResume();
-
-        mp.start();
+        pausereq = false;
+        musicSynth(pausebutton, pausereq, playbutton);
+        pausereq = false;
     }
 
     public void loadSong() {
@@ -91,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
             mp.reset();
             mp.setDataSource(afd);
             mp.prepare();
+            //mp.pause();
 
         } catch (Exception e) {
             e.printStackTrace();
