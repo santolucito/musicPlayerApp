@@ -1,43 +1,41 @@
 // a music player that stops when the app is paused
 
 G (
-     // when the app is paused, no user interaction
-      (isEvent(pauseReq) -> ! isEvent(playButton))
-   && (isEvent(pauseReq) -> ! isEvent(pauseButton))
+     // leaving the app disallows user interaction until resuming
+     (event(leaveApp) -> (((! event(playButton)) && (! event(pauseButton))) W event(resumeApp)))
 
      // pause and play cannot be pressed togehter
-   && (! (isEvent(playButton) && isEvent(pauseButton)))
+   && (! (event(playButton) && event(pauseButton)))
 
-//   && [[music <- play()]] ->  X (  isPlaying() W [[music <- pause]])
-//   && [[music <- pause()]] -> X (! isPlaying() W [[music <- play]])
+     // an app cannot immediately resume after when left
+   && (! (event(leaveApp) && event(resumeApp)))
+
+     // musicPlaying() changes accorinding to playing or pausing the music
+   && ([[music <- play()]]  -> X (  musicPlaying() W [[music <- pause()]]))
+   && ([[music <- pause()]] -> X (! musicPlaying() W [[music <- play()]]))
 )
 
 ->
 
 G (
      // allow the user to play and pause music
-     (isEvent(playButton) -> [[ music <- play() ]])
-   && (isEvent(pauseButton) -> [[ music <- pause() ]])
+     (event(playButton) -> [[ music <- play() ]])
+   && (event(pauseButton) -> [[ music <- pause() ]])
 
-     // music can only paused by the user or a pauseReq
-   && ([[ music <- pause() ]] -> (isEvent(pauseReq) || isEvent(pauseButton)))
+     // music can only be paused by the user or if we leave the app
+   && ([[ music <- pause() ]] -> (event(leaveApp) || event(pauseButton)))
 
      // music can only be played, if not paused
-   && ([[ music <- play() ]] -> ! isEvent(pauseReq))
+   && (event(leaveApp) -> ((! [[ music <- play() ]]) W event(resumeApp)))
 
      // if the user paused the music, only the user can play it again
-   && (([[ music <- pause() ]] && isEvent(pauseButton)) -> (! [[ music <- play() ]] W isEvent(playButton)))
+   && (event(pauseButton) -> (! [[ music <- play() ]] W event(playButton)))
 
      // if playing, stop music on pause and resume playing afterwards
-   && ( ( [[ music <- play() ]] && (! [[ music <- pause() ]] U isEvent(pauseReq)) )
-//   && ( isPlaying() && isEvent(pauseReq)
+   && ( musicPlaying() && event(leaveApp) -> [[ music <- pause() ]])
 
-       ->
-
-       ( ! isEvent(pauseReq) W (isEvent(pauseReq)
-           && [[ music <- pause() ]]
-           && (isEvent(pauseReq) W (! isEvent(pauseReq)
-             && (! isEvent(pauseButton) -> [[ music <- play() ]]))))
-       )
-     )
+     // if playing, stop music on pause and resume playing afterwards
+   && ( musicPlaying() && event(leaveApp) -> 
+         (! event(resumeApp) W (event(resumeApp) &&
+              (event(pauseButton) || [[ music <- play() ]]))))
 )

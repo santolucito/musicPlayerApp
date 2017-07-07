@@ -1,5 +1,5 @@
 package com.example.mark.myapplication;
-
+n
 import android.content.res.AssetFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -68,7 +68,14 @@ public class MainActivity extends AppCompatActivity {
         pausereq = true;
         musicSynth(pausebutton, pausereq, playbutton);
         pausereq = true;
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        pausereq = false;
+        musicSynth(pausebutton, pausereq, playbutton);
+        pausereq = false;
     }
 
     //output variable - NB outputs must NOT be set elsewhere
@@ -78,47 +85,83 @@ public class MainActivity extends AppCompatActivity {
 
     //Synthesized 'FRP' program
     private void musicSynth(boolean pausebutton , boolean pausereq , boolean playbutton){
-        if ( state==0 && ((((isevent(playbutton)) || (! isevent(pausereq))) || (! isevent(pausebutton))) && (((isevent(playbutton)) || (isevent(pausereq))) || (! isevent(pausebutton)))) && (((isevent(playbutton)) || (! isevent(pausereq))) || (isevent(pausebutton)))){
+        if ( state==0 && ((((! isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton)))){
             music=(play());
             state=0;
         }
-        if ( state==0 && ((! isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton))){
+        if ( state==0 && (((((((! isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((! isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton)))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton)))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton)))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))){
             music=(pause());
             state=0;
         }
-        if ( state==0 && ((! isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+        if ( state==0 && (((((((! isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((! isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((! isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((! isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
             music=music;
             state=0;
         }
 
-        if ( state==0 && ((! isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))){
+        if ( state==0 && ((((! isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
+            music=(play());
+            state=1;
+        }
+        if ( state==0 && ((((isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))){
             music=(pause());
             state=1;
         }
 
-        if ( state==1 && ((isevent(playbutton)) && (! isevent(pausereq))) && (! isevent(pausebutton))){
+        if ( state==1 && ((((! isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
             music=(play());
             state=0;
         }
-        if ( state==1 && ((isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+        if ( state==1 && ((((! isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton)))){
             music=(pause());
+            state=0;
+        }
+        if ( state==1 && ((((((! isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton)))) ||
+                ((((! isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
+            music=music;
             state=0;
         }
 
-        if ( state==1 && ((! isevent(playbutton)) && (isevent(pausereq))) && (isevent(pausebutton))){
+        if ( state==1 && ((((((! isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (! isevent(pausereq))) && (isevent(pausebutton)))) ||
+                ((((isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((! isplaying()) && (! isevent(playbutton))) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
             music=(play());
             state=1;
         }
-        if ( state==1 && ((((! isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))) || (((! isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton)))) || (((isevent(playbutton)) && (isevent(pausereq))) && (! isevent(pausebutton)))){
+        if ( state==1 && (((((isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))) ||
+                ((((! isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))) ||
+                ((((isplaying()) && (! isevent(playbutton))) && (isevent(pausereq))) && (! isevent(pausebutton)))){
             music=(pause());
             state=1;
         }
-        if ( state==1 && (((isevent(playbutton)) && (! isevent(pausereq))) && (isevent(pausebutton))) || (((! isevent(playbutton)) && (! isevent(pausereq))) && (! isevent(pausebutton)))){
+        if ( state==1 && (((! isplaying()) && (isevent(playbutton))) && (isevent(pausereq))) && (isevent(pausebutton))){
             music=music;
             state=1;
         }
+
+
+
         Log.d("myout",pausebutton+" "+pausereq+" "+playbutton+" "+state);
 
+    }
+
+    private boolean isplaying() {
+        return mp.isPlaying();
     }
 
     private boolean play(){
@@ -132,13 +175,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isevent(boolean x){
         return x;
     }
-    @Override
-    public void onResume() {
-        super.onResume();
-        pausereq = false;
-        musicSynth(pausebutton, pausereq, playbutton);
-        pausereq = false;
-    }
+
 
     public void loadSong() {
         try {
