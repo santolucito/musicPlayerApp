@@ -4,7 +4,7 @@ This is an android app that has been automatically synthesized from a TSL specif
 
 # Running the app
 
-[Download the .apk](https://marksantolucito.com/musicplayer.apk) or build from source by downloading this project. Installing a third party .apk requires developer mode to be turned on. This app also requires Android version > Nougat 7.0. If you do not have an android phone available with that version, you can make an emulator in Android Studio and run the app on your desktop.
+[Download the .apk](https://goo.gl/dXFTqs) or build from source by downloading this project. Installing a third party .apk requires developer mode to be turned on. This app also requires Android version > Nougat 7.0. If you do not have an android phone available with that version, you can make an emulator in Android Studio and run the app on your desktop.
 
 # Synthesis
 
