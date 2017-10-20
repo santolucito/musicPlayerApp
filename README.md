@@ -2,9 +2,11 @@
 
 This is an android app that has been automatically synthesized from a TSL specification.
 
+![Screenshot of the app][DemoScreenshot.png]
+
 # Running the app
 
-[Download the .apk](https://goo.gl/dXFTqs) or build from source by downloading this project. Installing a third party .apk requires developer mode to be turned on. This app also requires Android version > Nougat 7.0. If you do not have an android phone available with that version, you can make an emulator in Android Studio and run the app on your desktop.
+[Download the .apk](https://drive.google.com/file/d/0B4bcBamuuNyxeU5LT3RGRlQxNW8/view?usp=sharing) or build from source by downloading this project. Installing a third party .apk requires developer mode to be turned on. This app also requires Android version > Nougat 7.0. If you do not have an android phone available with that version, you can make an emulator in Android Studio and run the app on your desktop.
 
 # Synthesis
 
