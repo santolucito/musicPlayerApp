@@ -2,7 +2,7 @@
 
 This is an android app that has been automatically synthesized from a TSL specification.
 
-![Screenshot of the app][./DemoScreenshot.png]
+![Screenshot of the app][/DemoScreenshot.png]
 
 # Running the app
 
