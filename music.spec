@@ -2,40 +2,40 @@
 
 G (
      // leaving the app disallows user interaction until resuming
-     (event(leaveApp) -> (((! event(playButton)) && (! event(pauseButton))) W event(resumeApp)))
+     (leaveApp(sys) -> (((! playButton(sys)) && (! pauseButton(sys))) W resumeApp(sys)))
 
-     // pause and play cannot be pressed togehter
-   && (! (event(playButton) && event(pauseButton)))
+     // pause and play cannot be pressed together
+   && (! (playButton(sys) && pauseButton(sys)))
 
      // an app cannot immediately resume after when left
-   && (! (event(leaveApp) && event(resumeApp)))
+   && (! (leaveApp(sys) && resumeApp(sys)))
 
-     // musicPlaying() changes accorinding to playing or pausing the music
-   && ([[music <- play()]]  -> X (  musicPlaying() W [[music <- pause()]]))
-   && ([[music <- pause()]] -> X (! musicPlaying() W [[music <- play()]]))
+     // musicPlaying(mpIn) changes according to playing or pausing the mpIn
+   && ([[mpOut <- play(tr, trackPos(mpIn)) ]]  -> X (  musicPlaying(mpIn) W [[mpOut <- pause(mpIn)]]))
+   && ([[mpOut <- pause(mpIn)]] -> X (! musicPlaying(mpIn) W [[ mpOut <- play(tr, trackPos(mpIn)) ]]))
 )
 
 ->
 
 G (
-     // allow the user to play and pause music
-     (event(playButton) -> [[ music <- play() ]])
-   && (event(pauseButton) -> [[ music <- pause() ]])
+     // allow the user to play and pause mpIn
+     (playButton(sys) -> [[ mpOut <- play(tr, trackPos(mpIn)) ]])
+   && (pauseButton(sys) -> [[ mpOut <- pause(mpIn) ]])
 
-     // music can only be paused by the user or if we leave the app
-   && ([[ music <- pause() ]] -> (event(leaveApp) || event(pauseButton)))
+     // mpIn can only be paused by the user or if we leave the app
+   && ([[ mpOut <- pause(mpIn) ]] -> (leaveApp(sys) || pauseButton(sys)))
 
-     // music can only be played, if not paused
-   && (event(leaveApp) -> ((! [[ music <- play() ]]) W event(resumeApp)))
+     // mpIn can only be played, if not paused
+   && (leaveApp(sys) -> ((! [[ mpOut <- play(tr, trackPos(mpIn)) ]]) W resumeApp(sys)))
 
-     // if the user paused the music, only the user can play it again
-   && (event(pauseButton) -> (! [[ music <- play() ]] W event(playButton)))
+     // if the user paused the mpIn, only the user can play it again
+   && (pauseButton(sys) -> (! [[ mpOut <- play(tr, trackPos(mpIn)) ]] W playButton(sys)))
 
-     // if playing, stop music on pause and resume playing afterwards
-   && ( musicPlaying() && event(leaveApp) -> [[ music <- pause() ]])
+     // if playing, stop mpIn on pause and resume playing afterwards
+   && ( musicPlaying(mpIn) && leaveApp(sys) -> [[ mpOut <- pause(mpIn) ]])
 
-     // if playing, stop music on pause and resume playing afterwards
-   && ( musicPlaying() && event(leaveApp) -> 
-         (! event(resumeApp) W (event(resumeApp) &&
-              (event(pauseButton) || [[ music <- play() ]]))))
+     // if playing, stop mpIn on pause and resume playing afterwards
+   && ( musicPlaying(mpIn) && leaveApp(sys) ->
+         (! resumeApp(sys) W (resumeApp(sys) &&
+              (pauseButton(sys) || [[ mpOut <- play(tr, trackPos(mpIn)) ]]))))
 )

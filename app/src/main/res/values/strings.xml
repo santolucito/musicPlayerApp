@@ -1,3 +1,45 @@
 <resources>
     <string name="app_name">Music Player</string>
+    <string name="instructions">Choose the position in the song to start playing with the slider
+        \nSelect a track by typing either song.mp3 or song2.mp3</string>
+    <string name="spec">This app was synthesized form the below TSL specification:
+\n
+\n        // Assume:
+\n◻ (
+\n     leaveApp(sys) ⇒
+\n\t\t        ! playButton(sys) ∧ ! pauseButton(sys) W resumeApp(sys)
+\n
+\n   ∧ ! (playButton(sys) ∧ pauseButton(sys))
+\n
+\n   ∧ ! (leaveApp(sys) ∧ resumeApp(sys)
+\n
+\n   ∧ [mp ← play(tr, trackPos(mp))] ⇒
+\n\t\t        ◯ ( musicPlaying(mp) W [mp ← pause(mp)])
+\n   ∧ [mp ← pause(mp)] ⇒
+\n\t\t        ◯ (! musicPlaying(mp) W
+\n\t\t\t\t        [ mp ← play(tr, trackPos(mp)) ])
+\n)
+\n
+\n⇒
+\n
+\n // Guarantee:
+\n◻ (
+\n     playButton(sys) ⇒ [ mp ← play(tr, trackPos(mp)) ]
+\n   ∧ pauseButton(sys) ⇒ [ mp ← pause(mp) ]
+\n
+\n   ∧ [ mp ← pause(mp) ] ⇒ (leaveApp(sys) || pauseButton(sys))
+\n
+\n   ∧ leaveApp(sys) ⇒ ! [ mp ← play(tr, trackPos(mp)) ]) W resumeApp(sys)
+\n
+\n   ∧ pauseButton(sys) ⇒
+\n\t\t        ! [ mp ← play(tr, trackPos(mp)) ] W playButton(sys))
+\n
+\n   ∧ musicPlaying(mp) ∧ leaveApp(sys) ⇒ [ mp ← pause(mp) ]
+\n
+\n   ∧ ( musicPlaying(mp) ∧ leaveApp(sys) ⇒
+\n\t\t         (! resumeApp(sys) W (resumeApp(sys) ∧
+\n\t\t\t\t              (pauseButton(sys) ||
+\n\t\t\t\t        [ mp ← play(tr, trackPos(mp)) ])))
+\n)
+</string>
 </resources>
