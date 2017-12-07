@@ -9,10 +9,26 @@ import android.widget.Button;
 
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import android.app.Activity;
+import android.content.Context;
+import android.text.method.ScrollingMovementMethod;
+import android.widget.LinearLayout;
+
+
 public class MainActivity extends AppCompatActivity {
+    private Context mContext;
+    public Activity mActivity;
+
+    private LinearLayout mRootLayout;
+    private Button mButtonPlay;
+    private TextView mResult;
+
+    public static final int MY_PERMISSION_REQUEST_CODE = 123;
+
 
     private Button btn_play;
     private Button btn_pause;
@@ -38,17 +54,15 @@ public class MainActivity extends AppCompatActivity {
 
     private String tr = "";
 
-        //@RequiresApi(api = Build.VERSION_CODES.N)
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         btn_play = (Button) findViewById(R.id.buttonstart);
         btn_pause = (Button) findViewById(R.id.buttonpause);
         seekBar = (SeekBar) findViewById(R.id.seekBar);
-        songName = (TextView) findViewById(R.id.songText);
-
 
         mpIn.mp.setOnCompletionListener(new OnCompletionListener() {
             @Override
@@ -78,7 +92,45 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        // Get the application context
+        mContext = getApplicationContext();
+        mActivity = MainActivity.this;
+
+        // Get the widget reference from xml layout
+        mRootLayout = (LinearLayout) findViewById(R.id.root_layout);
+
+        final MusicQuery mQuery = new MusicQuery(this);
+        // Custom method to check permission at run time
+        mQuery.checkPermission();
+        mQuery.getMediaFileList(mContext);
+
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.songGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                loadSong(mQuery.uriList.get(checkedId));
+                mpIn.mp.start();
+            }
+        });
     }
+
+
+
+    /* TODO pretty sure I can remove this
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults){
+        switch(requestCode){
+            case MY_PERMISSION_REQUEST_CODE:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // Permission granted
+                }else {
+                    // Permission denied
+                }
+            }
+        }
+    }*/
+
 
     @Override
     public void onPause() {
@@ -99,10 +151,11 @@ public class MainActivity extends AppCompatActivity {
     private String oldTrack = "";
     public void loadSong(String uriLink) {
         try {
-            AssetFileDescriptor afd = getAssets().openFd(uriLink);
-
+            Log.d("t", uriLink);
+            //AssetFileDescriptor afd = getAssets().openFd(uriLink);
+            //TODO only reset when new song, otherwise just change tracker positon
             mpIn.mp.reset();
-            mpIn.mp.setDataSource(afd);
+            mpIn.mp.setDataSource(uriLink);
             mpIn.mp.prepare();
             //mp.pause();
             oldTrack=uriLink;
@@ -145,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void musicSynthIO(MPData mpIn , SysData sys , String tr) {
-        musicSynth(mpIn, sys, songName.getText().toString());
+        musicSynth(mpIn, sys, oldTrack);
     }
 
 

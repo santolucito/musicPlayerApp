@@ -33,20 +33,29 @@
             android:max="100"
             android:progress="0" />
 
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/instructions"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
 
-        <EditText
-            android:id="@+id/songText"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/root_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="song.mp3" />
+            android:layout_height="246dp"
+            android:padding="16dp"
+            android:orientation="vertical">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioGroup
+                    android:id="@+id/songGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="vertical" />
+            </ScrollView>
+
+        </LinearLayout>
 
         <ScrollView
             android:layout_width="match_parent"

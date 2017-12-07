@@ -13,3 +13,16 @@ This is an android app that has been automatically synthesized from a TSL specif
 The raw synthesized code is on the top level directory as music.java. This code is then embedded into [MainActivity.java](/app/src/main/java/com/example/mark/myapplication/MainActivity.java) to interact with the rest of the Android system. The specification is in the top level directory as music.spec.
 
 For details on how the synthesis works, please refer to our paper.
+
+## Put files on the emulator
+
+    $ adb root
+    $ adb shell
+    su
+    mount -o rw,remount rootfs /
+    chmod 777 /mnt/sdcard
+    exit
+    $ adb push song.mp3 /media/external/audio/media/song2.mp3
+      
+
+    
