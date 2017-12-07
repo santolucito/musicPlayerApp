@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -24,19 +23,19 @@ import static com.example.mark.myapplication.MainActivity.MY_PERMISSION_REQUEST_
  * adapted from https://android--examples.blogspot.com/2017/08/android-get-all-audio-files-from-sd-card.html
  */
 
-public class MusicQuery {
+class MusicQuery {
 
 
     private final MainActivity mainActivity;
 
-    public Vector<String> uriList = new Vector<>(5, 5);
+    Vector<String> uriList = new Vector<>(5, 5);
 
-    public MusicQuery(MainActivity mainActivity) {
+    MusicQuery(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 
     // Custom method to get all audio files list from external storage
-    protected void getMediaFileList(Context mContext) {
+    void getMediaFileList(Context mContext) {
 
         ContentResolver contentResolver = mContext.getContentResolver();
 
@@ -64,6 +63,7 @@ public class MusicQuery {
         } else if (!cursor.moveToFirst()) {
             // no media on the device
             Log.e("ERROR", "No music found on the sd card.");
+            addRadioButton("No music found on the sd card. Note we do not look inside app folders like \'Google Music\'", "");
         } else {
             int dataCol = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
             int titleCol = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -81,10 +81,12 @@ public class MusicQuery {
 
             } while (cursor.moveToNext());
         }
-        cursor.close();
+        if (cursor != null) {
+            cursor.close();
+        }
     }
 
-    public void addRadioButton(String title, String uri) {
+    private void addRadioButton(String title, String uri) {
 
         RadioGroup ll = (RadioGroup) mainActivity.findViewById(R.id.songGroup);
 
@@ -96,38 +98,36 @@ public class MusicQuery {
         Log.d("T", title + " " + rdbtn.getId());
     }
 
-    public void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (mainActivity.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                if (mainActivity.shouldShowRequestPermissionRationale(android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    // Show an alert dialog
-                    AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity.mActivity);
-                    builder.setMessage("Read external storage permission is required.");
-                    builder.setTitle("Please grant permission");
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            ActivityCompat.requestPermissions(
-                                    mainActivity.mActivity,
-                                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    MY_PERMISSION_REQUEST_CODE
-                            );
-                        }
-                    });
-                    builder.setNeutralButton("Cancel", null);
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                } else {
-                    // Request permission
-                    ActivityCompat.requestPermissions(
-                            mainActivity.mActivity,
-                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSION_REQUEST_CODE
-                    );
-                }
+    void checkPermission() {
+        if (mainActivity.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (mainActivity.shouldShowRequestPermissionRationale(android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // Show an alert dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity.mActivity);
+                builder.setMessage("Read external storage permission is required.");
+                builder.setTitle("Please grant permission");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(
+                                mainActivity.mActivity,
+                                new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                                MY_PERMISSION_REQUEST_CODE
+                        );
+                    }
+                });
+                builder.setNeutralButton("Cancel", null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
             } else {
-                // Permission already granted
+                // Request permission
+                ActivityCompat.requestPermissions(
+                        mainActivity.mActivity,
+                        new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSION_REQUEST_CODE
+                );
             }
+        } else {
+            // Permission already granted
         }
     }
 

@@ -2,44 +2,56 @@
     <string name="app_name">Music Player</string>
     <string name="instructions">Choose the position in the song to start playing with the slider
         \nSelect a track by typing either song.mp3 or song2.mp3</string>
-    <string name="spec">This app was synthesized form the below TSL specification:
+    <!-- To learn more about TSL see:
+\n <a href="https://arxiv.org/abs/1712.00246"><u>https://arxiv.org/abs/1712.00246</u></a> TODO put this in the spec string-->
+    <string name="spec">This app was synthesized from the below TSL specification.
 \n
-\n        // Assume:
-\n◻ (
-\n     leaveApp(sys) ⇒
-\n\t\t        ! playButton(sys) ∧ ! pauseButton(sys) W resumeApp(sys)
-\n
-\n   ∧ ! (playButton(sys) ∧ pauseButton(sys))
-\n
-\n   ∧ ! (leaveApp(sys) ∧ resumeApp(sys)
-\n
-\n   ∧ [mp ← play(tr, trackPos(mp))] ⇒
-\n\t\t        ◯ ( musicPlaying(mp) W [mp ← pause(mp)])
-\n   ∧ [mp ← pause(mp)] ⇒
-\n\t\t        ◯ (! musicPlaying(mp) W
-\n\t\t\t\t        [ mp ← play(tr, trackPos(mp)) ])
-\n)
-\n
-\n⇒
-\n
-\n // Guarantee:
-\n◻ (
-\n     playButton(sys) ⇒ [ mp ← play(tr, trackPos(mp)) ]
-\n   ∧ pauseButton(sys) ⇒ [ mp ← pause(mp) ]
-\n
-\n   ∧ [ mp ← pause(mp) ] ⇒ (leaveApp(sys) || pauseButton(sys))
-\n
-\n   ∧ leaveApp(sys) ⇒ ! [ mp ← play(tr, trackPos(mp)) ]) W resumeApp(sys)
-\n
-\n   ∧ pauseButton(sys) ⇒
-\n\t\t        ! [ mp ← play(tr, trackPos(mp)) ] W playButton(sys))
-\n
-\n   ∧ musicPlaying(mp) ∧ leaveApp(sys) ⇒ [ mp ← pause(mp) ]
-\n
-\n   ∧ ( musicPlaying(mp) ∧ leaveApp(sys) ⇒
-\n\t\t         (! resumeApp(sys) W (resumeApp(sys) ∧
-\n\t\t\t\t              (pauseButton(sys) ||
-\n\t\t\t\t        [ mp ← play(tr, trackPos(mp)) ])))
-\n)
+\n updPlay  = [ mpOut - play(tr, trackPos(mpIn)) ];
+\n updPause = [ mpOut - pause(mpIn) ];
+\n 
+\n always assume {
+\n \t // leaving the app disallows user interaction
+\n \t // until resuming
+\n \t leaveApp(sys) ->
+\n \t (! playButton(sys) &amp;&amp; ! pauseButton(sys) W
+\n \t \t resumeApp(sys));
+\n 
+\n  \t // pause and play cannot be pressed together
+\n  \t ! (playButton(sys) &amp;&amp; pauseButton(sys));
+\n 
+\n  \t // an app cannot immediately resume after leaving
+\n  \t ! (leaveApp(sys) &amp;&amp; resumeApp(sys));
+\n 
+\n  \t // musicPlaying(mpIn) changes with
+\n  \t // play and pause buttons
+\n  \t updPlay  -> X (  musicPlaying(mpIn) W updPause);
+\n  \t updPause -> X (! musicPlaying(mpIn) W updPlay);
+\n }
+\n 
+\n always guarantee {
+\n \t // allow the user to play and pause music
+\n \t playButton(sys)  -> updPlay;
+\n \t pauseButton(sys) -> updPause;
+\n 
+\n \t // music can only be paused by the user
+\n \t // or if we leave the app
+\n \t updPause -> leaveApp(sys) || pauseButton(sys);
+\n 
+\n \t // music can only be played, if not paused
+\n \t leaveApp(sys) -> (! updPlay W resumeApp(sys));
+\n 
+\n \t // if the user paused the music,
+\n \t only the user can play it again
+\n \t pauseButton(sys) -> (! updPlay W playButton(sys));
+\n 
+\n \t // if playing, stop music on pause
+\n \t // and resume playing afterwards
+\n \t musicPlaying(mpIn) &amp;&amp; leaveApp(sys) -> updPause;
+\n 
+\n \t // if playing, stop music on pause
+\n \t // and resume playing afterwards
+\n \t musicPlaying(mpIn) &amp;&amp; leaveApp(sys)
+\n \t \t -> resumeApp(sys) A (pauseButton(sys) || updPlay);
+\n }
 </string>
 </resources>

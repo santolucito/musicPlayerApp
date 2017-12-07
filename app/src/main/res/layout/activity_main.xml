@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.mark.myapplication.MainActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        >
+        android:orientation="vertical"
+        android:weightSum="1"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="114dp">
 
         <Button
             android:id="@+id/buttonstart"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Play"
-            />
+            android:text="Play" />
+
         <Button
             android:id="@+id/buttonpause"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Pause"
-            />
+            android:text="Pause" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Drag to select the start position in the song" />
 
         <SeekBar
             android:id="@+id/seekBar"
@@ -35,17 +41,27 @@
 
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/root_layout"
             android:layout_width="match_parent"
             android:layout_height="246dp"
+            android:layout_weight="0.99"
+            android:orientation="vertical"
             android:padding="16dp"
-            android:orientation="vertical">
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.09"
+                android:text="Select an audio file from your SD card to play" />
 
             <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_weight="0.74">
+
 
                 <RadioGroup
                     android:id="@+id/songGroup"
@@ -57,20 +73,11 @@
 
         </LinearLayout>
 
-        <ScrollView
+        <Button
+            android:id="@+id/showSpec"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbarStyle="insideOverlay">
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/spec"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
-
-
-        </ScrollView>
+            android:layout_height="wrap_content"
+            android:text="How its made" />
 
     </LinearLayout>
 
